@@ -21,14 +21,14 @@ var load_data = function(){
 		// 	layer.bindPopup('District: <strong>' + layer.feature.properties.DISTRICT + '</strong>', { closeButton: false});
 		// });
   //   })
-    elemLayer.loadURL('/assets/data/elem.geojson');
-    middleLayer.loadURL('/assets/data/middle.geojson');
-    highLayer.loadURL('/assets/data/high.geojson');
-    magistrateLayer.loadURL('/assets/data/magistrate.geojson');
-    houseLayer.loadURL('/assets/data/house.geojson');
-    senateLayer.loadURL('/assets/data/senate.geojson');
-    schoolBoardLayer.loadURL('/assets/data/school-board.geojson');
-    votingLayer.loadURL('/assets/data/voting.geojson');
+    elemLayer.loadURL('assets/data/elem.geojson');
+    middleLayer.loadURL('assets/data/middle.geojson');
+    highLayer.loadURL('assets/data/high.geojson');
+    magistrateLayer.loadURL('assets/data/magistrate.geojson');
+    houseLayer.loadURL('assets/data/house.geojson');
+    senateLayer.loadURL('assets/data/senate.geojson');
+    schoolBoardLayer.loadURL('assets/data/school-board.geojson');
+    votingLayer.loadURL('assets/data/voting.geojson');
     
 }
 
