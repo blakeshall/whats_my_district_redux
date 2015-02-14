@@ -15,7 +15,7 @@ var lookupMarker = L.marker([38.05, -84.5], {
 });
 
 var load_data = function(){
-    councilLayer.loadURL('/assets/data/council.geojson');
+    councilLayer.loadURL('assets/data/council.geojson');
   //   .on('ready', function(data){
   //   	councilLayer.eachLayer(function(layer) {
 		// 	layer.bindPopup('District: <strong>' + layer.feature.properties.DISTRICT + '</strong>', { closeButton: false});
