@@ -13,7 +13,6 @@
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v1.4.0/turf.min.js'></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 	<script src='assets/js/handlebars-v3.0.0.js'></script>
-	<script src='assets/js/Leaflet.MakiMarkers.js'></script>
 	<script src='assets/js/whats-my-district.js'></script>
 </head>
 <body>
@@ -79,6 +78,7 @@
 				<div id='council-results'></div>
 				<div id='magistrate-results'></div>
 				<div id='voting-results'></div>
+				<div id='neighborhood-assoc-results'></div>
 			</div>
 			<div class='col-md-4 text-center'>
 				<h2>Schools</h2>
@@ -154,6 +154,12 @@
 	  <ul class='list-unstyled'>
 	  	<li>School Board District: {{District}}</li>
 	  	<li>Rep: {{Rep}}</li>
+	  </ul>
+	</script>
+
+	<script id="neighborhood-assoc-template" type="text/x-handlebars-template">
+	  <ul class='list-unstyled'>
+	  	<li>Neighborhood Association(s): {{Assoc_Name}}</li>
 	  </ul>
 	</script>
 

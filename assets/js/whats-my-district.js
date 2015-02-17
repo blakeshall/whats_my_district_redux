@@ -10,6 +10,7 @@ var houseLayer = L.mapbox.featureLayer();
 var senateLayer = L.mapbox.featureLayer();
 var schoolBoardLayer = L.mapbox.featureLayer();
 var votingLayer = L.mapbox.featureLayer();
+var neighborhoodAssocLayer = L.mapbox.featureLayer();
 var postOfficeLayer = L.mapbox.featureLayer();
 var fireStationLayer = L.mapbox.featureLayer();
 var libraryLayer = L.mapbox.featureLayer();
@@ -19,11 +20,11 @@ var postMarker = L.mapbox.featureLayer();
 var fireMarker = L.mapbox.featureLayer();
 var libraryMarker = L.mapbox.featureLayer();
 var hospitalMarker = L.mapbox.featureLayer();
-var lookupMarker = L.marker([38.05, -84.5], {
+var lookupMarker = L.marker([0, 0], {
 	"marker-color": "#3bb20"
 });
 
-var load_data = function(){
+var loadData = function(){
     councilLayer.loadURL('assets/data/council.geojson');
   //   .on('ready', function(data){
   //   	councilLayer.eachLayer(function(layer) {
@@ -42,93 +43,14 @@ var load_data = function(){
     fireStationLayer.loadURL('assets/data/fire-station.geojson');
     libraryLayer.loadURL('assets/data/library.geojson');
     hospitalLayer.loadURL('assets/data/hospital.geojson');
+    neighborhoodAssocLayer.loadURL('assets/data/neighborhood-assoc.geojson');
     countyLayer.loadURL('assets/data/county.geojson');
     
 }
 
-var findCouncil = function(point) {
+var findDistrict = function(point, districtLayer){
 	var district;
-	councilLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findElementary = function(point) {
-	var district;
-	elemLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findMiddle = function(point) {
-	var district;
-	middleLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findHigh = function(point) {
-	var district;
-	highLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findMagistrate = function(point) {
-	var district;
-	magistrateLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findHouse = function(point) {
-	var district;
-	houseLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findSenate = function(point) {
-	var district;
-	senateLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findSchoolBoard = function(point) {
-	var district;
-	schoolBoardLayer.eachLayer(function(layer){
-		if (turf.inside(point, layer.feature) ==  true) {
-			district = layer;
-		}
-	});
-	return district.feature.properties;
-}
-
-var findVoting = function(point) {
-	var district;
-	votingLayer.eachLayer(function(layer){
+	districtLayer.eachLayer(function(layer){
 		if (turf.inside(point, layer.feature) ==  true) {
 			district = layer;
 		}
@@ -164,67 +86,11 @@ var getPoint = function(lat, lng){
 	return point;
 }
 
-var setCouncil = function(props) {
-	var source = $('#council-template').html();
+var setTemplate = function(props, sourceTemplate, output){
+	var source = $(sourceTemplate).html();
 	var template = Handlebars.compile(source);
 	var html = template(props);
-	$('#council-results').html(html);
-}
-
-var setElem = function(props) {
-	var source = $('#elem-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#elem-results').html(html);
-}
-
-var setMiddle = function(props) {
-	var source = $('#middle-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#middle-results').html(html);
-}
-
-var setHigh = function(props) {
-	var source = $('#high-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#high-results').html(html);
-}
-
-var setMagistrate = function(props) {
-	var source = $('#magistrate-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#magistrate-results').html(html);
-}
-
-var setHouse = function(props) {
-	var source = $('#house-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#house-results').html(html);
-}
-
-var setSenate = function(props) {
-	var source = $('#senate-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#senate-results').html(html);
-}
-
-var setSchoolBoard = function(props) {
-	var source = $('#school-board-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#school-board-results').html(html);
-}
-
-var setVoting = function(props) {
-	var source = $('#voting-template').html();
-	var template = Handlebars.compile(source);
-	var html = template(props);
-	$('#voting-results').html(html);
+	$(output).html(html);
 }
 
 var addressLookup = function(query) {
@@ -246,15 +112,16 @@ var findDistricts = function(point) {
 	setMarker(fireStation, fireMarker,  '#FF0000', 'fire-station', 'small');
 	setMarker(library, libraryMarker,  '#57FF65', 'library', 'small');
 	setMarker(hospital, hospitalMarker,  '#FFFFFF', 'hospital', 'small');
-	setCouncil(findCouncil(point));
-	setElem(findElementary(point));
-	setMiddle(findMiddle(point));
-	setHigh(findHigh(point));
-	setMagistrate(findMagistrate(point));
-	setHouse(findHouse(point));
-	setSenate(findSenate(point));
-	setSchoolBoard(findSchoolBoard(point));
-	setVoting(findVoting(point));
+	setTemplate(findDistrict(point, councilLayer), '#council-template', '#council-results');
+	setTemplate(findDistrict(point, elemLayer), '#elem-template', '#elem-results');
+	setTemplate(findDistrict(point, middleLayer), '#middle-template', '#middle-results');
+	setTemplate(findDistrict(point, highLayer), '#high-template', '#high-results');
+	setTemplate(findDistrict(point, houseLayer), '#house-template', '#house-results');
+	setTemplate(findDistrict(point, senateLayer), '#senate-template', '#senate-results');
+	setTemplate(findDistrict(point, schoolBoardLayer), '#school-board-template', '#school-board-results');
+	setTemplate(findDistrict(point, votingLayer), '#voting-template', '#voting-results');
+	setTemplate(findDistrict(point, magistrateLayer), '#magistrate-template', '#magistrate-results');
+	// setTemplate(findDistrict(point, neighborhoodAssocLayer), '#neighborhood-assoc-template', '#neighborhood-assoc-results');
 	lookupMarker.setLatLng([point.geometry.coordinates[1], point.geometry.coordinates[0]]);
 	lookupMarker.setOpacity(1)
 
@@ -270,7 +137,7 @@ $(document).ready(function(){
 
 	lookupMarker.setOpacity(0)
 	lookupMarker.addTo(map);
-	load_data();
+	loadData();
 	countyLayer.addTo(map);
 	
 	countyLayer.on('click', function(e) {
