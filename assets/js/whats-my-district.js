@@ -10,6 +10,9 @@ var houseLayer = L.mapbox.featureLayer();
 var senateLayer = L.mapbox.featureLayer();
 var schoolBoardLayer = L.mapbox.featureLayer();
 var votingLayer = L.mapbox.featureLayer();
+var postOfficeLayer = L.mapbox.featureLayer();
+var countyLayer = L.mapbox.featureLayer();
+var postMarker = L.mapbox.featureLayer();
 var lookupMarker = L.marker([38.05, -84.5], {
 	"marker-color": "#3bb20"
 });
@@ -29,6 +32,8 @@ var load_data = function(){
     senateLayer.loadURL('assets/data/senate.geojson');
     schoolBoardLayer.loadURL('assets/data/school-board.geojson');
     votingLayer.loadURL('assets/data/voting.geojson');
+    postOfficeLayer.loadURL('assets/data/post-office.geojson');
+    countyLayer.loadURL('assets/data/county.geojson');
     
 }
 
@@ -120,6 +125,22 @@ var findVoting = function(point) {
 		}
 	});
 	return district.feature.properties;
+}
+
+var findNearest = function (featureLayer, point) {
+	var nearest;
+	var geojson = featureLayer.getGeoJSON();
+	nearest = turf.nearest(point, geojson);
+	return nearest;
+}
+
+var setPostMarker =  function(point){
+	point.properties['marker-color'] = '#63b6e5';
+	point.properties['marker-symbol'] = 'post';
+	point.properties['marker-size'] = 'small';
+	map.removeLayer(postMarker);
+	postMarker.setGeoJSON(point);
+	postMarker.addTo(map);
 }
 
 var getPoint = function(lat, lng){
@@ -233,9 +254,12 @@ $(document).ready(function(){
 	lookupMarker.setOpacity(0)
 	lookupMarker.addTo(map);
 	load_data();
-	map.on('click', function(e) {
+	countyLayer.addTo(map);
+	
+	countyLayer.on('click', function(e) {
 		var point = getPoint(e.latlng.lat, e.latlng.lng);
-
+		postOffice = findNearest(postOfficeLayer, point)
+		setPostMarker(postOffice);
 		findDistricts(point);
 		
 	});
