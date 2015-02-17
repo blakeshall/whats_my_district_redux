@@ -11,8 +11,14 @@ var senateLayer = L.mapbox.featureLayer();
 var schoolBoardLayer = L.mapbox.featureLayer();
 var votingLayer = L.mapbox.featureLayer();
 var postOfficeLayer = L.mapbox.featureLayer();
+var fireStationLayer = L.mapbox.featureLayer();
+var libraryLayer = L.mapbox.featureLayer();
+var hospitalLayer = L.mapbox.featureLayer();
 var countyLayer = L.mapbox.featureLayer();
 var postMarker = L.mapbox.featureLayer();
+var fireMarker = L.mapbox.featureLayer();
+var libraryMarker = L.mapbox.featureLayer();
+var hospitalMarker = L.mapbox.featureLayer();
 var lookupMarker = L.marker([38.05, -84.5], {
 	"marker-color": "#3bb20"
 });
@@ -33,6 +39,9 @@ var load_data = function(){
     schoolBoardLayer.loadURL('assets/data/school-board.geojson');
     votingLayer.loadURL('assets/data/voting.geojson');
     postOfficeLayer.loadURL('assets/data/post-office.geojson');
+    fireStationLayer.loadURL('assets/data/fire-station.geojson');
+    libraryLayer.loadURL('assets/data/library.geojson');
+    hospitalLayer.loadURL('assets/data/hospital.geojson');
     countyLayer.loadURL('assets/data/county.geojson');
     
 }
@@ -134,13 +143,13 @@ var findNearest = function (featureLayer, point) {
 	return nearest;
 }
 
-var setPostMarker =  function(point){
-	point.properties['marker-color'] = '#63b6e5';
-	point.properties['marker-symbol'] = 'post';
-	point.properties['marker-size'] = 'small';
-	map.removeLayer(postMarker);
-	postMarker.setGeoJSON(point);
-	postMarker.addTo(map);
+var setMarker = function(point, markerLayer, color, icon, size){
+	point.properties['marker-color'] = color;
+	point.properties['marker-symbol'] = icon;
+	point.properties['marker-size'] = size;
+	map.removeLayer(markerLayer);
+	markerLayer.setGeoJSON(point);
+	markerLayer.addTo(map);
 }
 
 var getPoint = function(lat, lng){
@@ -221,7 +230,7 @@ var setVoting = function(props) {
 var addressLookup = function(query) {
 	geocoder.query(query, function(err, data){
 		if (data.latlng) {
-	        map.setView([data.latlng[0], data.latlng[1]], 16);
+	        map.setView([data.latlng[0], data.latlng[1]], 13);
 	        var point = getPoint(data.latlng[0], data.latlng[1]);
 	        findDistricts(point);
 	    }
@@ -229,6 +238,14 @@ var addressLookup = function(query) {
 };
 
 var findDistricts = function(point) {
+	var postOffice = findNearest(postOfficeLayer, point)
+	var fireStation = findNearest(fireStationLayer, point);
+	var library = findNearest(libraryLayer, point);
+	var hospital = findNearest(hospitalLayer, point);
+	setMarker(postOffice, postMarker, '#63b6e5', 'post', 'small');
+	setMarker(fireStation, fireMarker,  '#FF0000', 'fire-station', 'small');
+	setMarker(library, libraryMarker,  '#57FF65', 'library', 'small');
+	setMarker(hospital, hospitalMarker,  '#FFFFFF', 'hospital', 'small');
 	setCouncil(findCouncil(point));
 	setElem(findElementary(point));
 	setMiddle(findMiddle(point));
@@ -258,8 +275,6 @@ $(document).ready(function(){
 	
 	countyLayer.on('click', function(e) {
 		var point = getPoint(e.latlng.lat, e.latlng.lng);
-		postOffice = findNearest(postOfficeLayer, point)
-		setPostMarker(postOffice);
 		findDistricts(point);
 		
 	});
