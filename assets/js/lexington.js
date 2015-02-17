@@ -78,10 +78,34 @@ var findDistricts = function(point) {
     var fireStation = findNearest(fireStationLayer, point);
     var library = findNearest(libraryLayer, point);
     var hospital = findNearest(hospitalLayer, point);
-    setMarker(postOffice, postMarker, '#63b6e5', 'post', 'small', postOffice.properties.NAME, postOffice.properties.ADDRESS, map);
-    setMarker(fireStation, fireMarker,  '#FF0000', 'fire-station', 'small', fireStation.properties.MORE, fireStation.properties.ADDRESS, map);
-    setMarker(library, libraryMarker,  '#57FF65', 'library', 'small', library.properties.NAME, library.properties.ADDRESS, map);
-    setMarker(hospital, hospitalMarker,  '#FFFFFF', 'hospital', 'small', hospital.properties.NAME, hospital.properties.ADDRESS, map);
+    setMarker(map, postOffice, postMarker, {
+        color: '#63b6e5',
+        icon: 'post',
+        size: 'small',
+        title: postOffice.properties.NAME,
+        description: postOffice.properties.ADDRESS
+    });
+    setMarker(map, fireStation, fireMarker, {
+        color: '#FF0000',
+        icon: 'fire-station',
+        size: 'small',
+        title: fireStation.properties.MORE,
+        description: fireStation.properties.ADDRESS
+    });
+    setMarker(map, library, libraryMarker,{
+      color: '#57FF65',
+      icon: 'library',
+      size: 'small',
+      title: library.properties.NAME,
+      description: library.properties.ADDRESS
+    });
+    setMarker(map, hospital, hospitalMarker,{
+        color: '#FFFFFF',
+        icon: 'hospital',
+        size: 'small',
+        title: hospital.properties.NAME,
+        description: hospital.properties.ADDRESS
+    });
     setTemplate(findDistrict(point, councilLayer), '#council-template', '#council-results');
     setTemplate(findDistrict(point, elemLayer), '#elem-template', '#elem-results');
     setTemplate(findDistrict(point, middleLayer), '#middle-template', '#middle-results');
