@@ -70,7 +70,7 @@ var loadData = function(){
     hospitalLayer.loadURL('assets/data/hospital.geojson');
     neighborhoodAssocLayer.loadURL('assets/data/neighborhood-assoc.geojson');
     countyLayer.loadURL('assets/data/county.geojson');
-    
+
 }
 
 var findDistricts = function(point) {
@@ -131,7 +131,36 @@ var addressLookup = function(query) {
     });
 };
 
+function createCookie(name, value, days) {
+  var expires;
+
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toGMTString();
+  } else {
+    expires = "";
+  }
+  document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+}
+
+function readCookie(name) {
+  var nameEQ = encodeURIComponent(name) + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+  }
+  return null;
+}
+
+var setAddress = function(address) {
+  $('#search-address').val(address);
+};
+
 $(document).ready(function(){
+    setAddress(readCookie("query"));
     initVariables();
 
     map = L.mapbox.map('map', 'mapbox.light')
@@ -141,15 +170,17 @@ $(document).ready(function(){
     lookupMarker.addTo(map);
     loadData();
     countyLayer.addTo(map);
-    
+
     countyLayer.on('click', function(e) {
         var point = getPoint(e.latlng.lat, e.latlng.lng);
         findDistricts(point);
-        
+
     });
     $('#search').on('click', function(e){
         e.preventDefault();
-        addressLookup($('#search-address').val() + ' Lexington , KY');
+        var address = $('#search-address').val()
+        createCookie("query", address);
+        addressLookup(address + ' Lexington , KY');
     });
 
     postMarker.on('mouseover', function(e){
