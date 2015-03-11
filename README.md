@@ -4,7 +4,7 @@
 
 [What's My District?](http://www.whatsmydistrict.org) started off as a National
 Day of Civic Hacking project. It essentially allows anyone in Lexington, KY to
-input their address and find out all the differenct districts they are in,
+input their address and find out all the different districts they are in,
 including schools, council districts, magistrate districts, and etc.
 
 
@@ -21,7 +21,15 @@ way other cities can get a jump start building their own version.
 
 Current Dependencies:
 
-- Mapbox.js
-- Turf.js
-- jQuery (could probably be replaced easily)
-- Handlebars.js
+- [Mapbox.js](https://www.mapbox.com/mapbox.js/api/v2.1.5/)
+- [Turf.js](http://turfjs.org/)
+- [jQuery](https://jquery.com/) (could probably be replaced easily)
+- [Handlebars.js](http://handlebarsjs.com/)
+
+## Running locally
+
+Use Python simple server from project root directory.
+
+1. `python -m SimpleHTTPServer`
+1. load [localhost:8000](http://localhost:8000)
+1. voila!
