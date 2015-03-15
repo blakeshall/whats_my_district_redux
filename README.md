@@ -33,3 +33,13 @@ Use Python simple server from project root directory.
 1. `python -m SimpleHTTPServer`
 1. load [localhost:8000](http://localhost:8000)
 1. voila!
+
+## Keeping `gh-pages` branch in sync with master
+
+After merging pull-request into master,
+
+1. `git co master`
+1. `git pull`
+1. `git co gh-pages`
+1. `git merge master`
+1. `git push`
