@@ -38,6 +38,15 @@
 			/*top: -60px;*/
 			height: 0;
 		}
+		#footer {
+			margin-top: 4em;
+			padding-top: 2em;
+			border-top: 1px #ccc solid;
+			width: 100%;
+		  min-height: 5em;
+		  background-color: #f5f5f5;
+		  text-align: center;
+		}
 	</style>
 	<div class="container">
 		<div class='row'>
@@ -72,6 +81,7 @@
 		<div class='row'>
 			<div class='col-md-3 col-md-offset-1 text-center'>
 				<h2>State</h2>
+				<p class="temp">please enter an address</p>
 				<div class='col-md-offset-2'>
 					<div id='senate-results' class='text-left'></div>
 					<div id='house-results' class='text-left'></div>
@@ -79,6 +89,7 @@
 			</div>
 			<div class='col-md-4 text-center'>
 				<h2>Local</h2>
+				<p class="temp">please enter an address</p>
 				<div class='col-md-offset-3'>
 					<div id='council-results' class='text-left'></div>
 					<div id='magistrate-results' class='text-left'></div>
@@ -88,6 +99,7 @@
 			</div>
 			<div class='col-md-3 text-center'>
 				<h2>Schools</h2>
+				<p class="temp">please enter an address</p>
 					<div class='col-md-offset-2'>
 					<div id='elem-results' class='text-left'></div>
 					<div id='middle-results' class='text-left'></div>
@@ -96,7 +108,6 @@
 				</div>
 			</div>
 		</div>
-
 
 	</div>
 	<script>
@@ -207,5 +218,15 @@
 	  </ul>
 	</script>
 
+	<div id="footer">
+		<div class="container">
+			<p>
+				Made by <a href="http://openlexington.org">OpenLexington</a> in 2015 |
+				Data from <a href="http://data.lexingtonky.gov">Lexington's Open Data Catalog</a> |
+				<a href="https://github.com/openlexington/whats_my_district_redux">Fork this project on GitHub</a>
+			</p>
+			<p><a href="http://openlexington.org"><img src="assets/img/OpenLex_sm.png"></a></p>
+		</div>
+	</div>
 </body>
 </html>

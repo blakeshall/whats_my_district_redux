@@ -117,8 +117,8 @@ var findDistricts = function(point) {
     setTemplate(findDistrict(point, magistrateLayer), '#magistrate-template', '#magistrate-results');
     // setTemplate(findDistrict(point, neighborhoodAssocLayer), '#neighborhood-assoc-template', '#neighborhood-assoc-results');
     lookupMarker.setLatLng([point.geometry.coordinates[1], point.geometry.coordinates[0]]);
-    lookupMarker.setOpacity(1)
-
+    lookupMarker.setOpacity(1);
+    $('.temp').hide();
 };
 
 var addressLookup = function(query) {
