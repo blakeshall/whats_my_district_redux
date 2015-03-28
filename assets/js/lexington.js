@@ -20,26 +20,40 @@ var fireMarker;
 var libraryMarker;
 var hospitalMarker;
 var lookupMarker;
+var layers = [];
+var markers = [];
 
 var initVariables = function(){
+    // change accessToken to your Mapbox token
+    // see: https://www.mapbox.com/account/apps/
     L.mapbox.accessToken = 'pk.eyJ1IjoiYmxha2VzaGFsbCIsImEiOiJRSkN3Y3prIn0.MfDnpigJE6CVbEsV0xwLfA';
-    map;
     geocoder = L.mapbox.geocoder('mapbox.places');
     councilLayer = L.mapbox.featureLayer();
+    layers.push(councilLayer);
     elemLayer = L.mapbox.featureLayer();
+    layers.push(elemLayer);
     middleLayer = L.mapbox.featureLayer();
+    layers.push(middleLayer);
     highLayer = L.mapbox.featureLayer();
+    layers.push(highLayer);
     magistrateLayer = L.mapbox.featureLayer();
+    layers.push(magistrateLayer);
     houseLayer = L.mapbox.featureLayer();
+    layers.push(houseLayer);
     senateLayer = L.mapbox.featureLayer();
+    layers.push(senateLayer);
     schoolBoardLayer = L.mapbox.featureLayer();
+    layers.push(schoolBoardLayer);
     votingLayer = L.mapbox.featureLayer();
+    layers.push(votingLayer);
     neighborhoodAssocLayer = L.mapbox.featureLayer();
+    layers.push(neighborhoodAssocLayer);
     postOfficeLayer = L.mapbox.featureLayer();
     fireStationLayer = L.mapbox.featureLayer();
     libraryLayer = L.mapbox.featureLayer();
     hospitalLayer = L.mapbox.featureLayer();
     countyLayer = L.mapbox.featureLayer();
+    layers.push(countyLayer);
     postMarker = L.mapbox.featureLayer();
     fireMarker = L.mapbox.featureLayer();
     libraryMarker = L.mapbox.featureLayer();
@@ -51,11 +65,11 @@ var initVariables = function(){
 
 var loadData = function(){
     councilLayer.loadURL('assets/data/council.geojson');
-  //   .on('ready', function(data){
-  //   	councilLayer.eachLayer(function(layer) {
-		// 	layer.bindPopup('District: <strong>' + layer.feature.properties.DISTRICT + '</strong>', { closeButton: false});
-		// });
-  //   })
+      //   .on('ready', function(data){
+      //   	councilLayer.eachLayer(function(layer) {
+    		// 	layer.bindPopup('District: <strong>' + layer.feature.properties.DISTRICT + '</strong>', { closeButton: false});
+    		// });
+      //   });
     elemLayer.loadURL('assets/data/elem.geojson');
     middleLayer.loadURL('assets/data/middle.geojson');
     highLayer.loadURL('assets/data/high.geojson');
@@ -118,6 +132,7 @@ var findDistricts = function(point) {
     // setTemplate(findDistrict(point, neighborhoodAssocLayer), '#neighborhood-assoc-template', '#neighborhood-assoc-results');
     lookupMarker.setLatLng([point.geometry.coordinates[1], point.geometry.coordinates[0]]);
     lookupMarker.setOpacity(1)
+    setLayerListeners();
 
 };
 
@@ -131,6 +146,70 @@ var addressLookup = function(query) {
     });
 };
 
+var clearLayers = function() {
+    if(map.hasLayer(countyLayer)){
+        map.removeLayer(countyLayer);
+    }
+    layers.forEach(function(layer){
+        if(map.hasLayer(layer)){
+            map.removeLayer(layer);
+        }
+    });
+};
+
+var reset = function(){
+    clearLayers();
+    countyLayer.addTo(map);
+}
+
+var setLayerListeners = function(){
+    $('#show-council').on('click', function(e){
+        clearLayers();
+        councilLayer.addTo(map);
+        return false;
+    });
+    $('#show-house').on('click', function(e){
+        clearLayers();
+        houseLayer.addTo(map);
+        return false;
+    });
+    $('#show-senate').on('click', function(e){
+        clearLayers();
+        senateLayer.addTo(map);
+        return false;
+    });
+    $('#show-magistrate').on('click', function(e){
+        clearLayers();
+        magistrateLayer.addTo(map);
+        return false;
+    });
+    $('#show-elem').on('click', function(e){
+        clearLayers();
+        elemLayer.addTo(map);
+        return false;
+    });
+    $('#show-middle').on('click', function(e){
+        clearLayers();
+        middleLayer.addTo(map);
+        return false;
+    });
+    $('#show-high').on('click', function(e){
+        clearLayers();
+        highLayer.addTo(map);
+        return false;
+    });
+    $('#show-school-board').on('click', function(e){
+        clearLayers();
+        schoolBoardLayer.addTo(map);
+        return false;
+    });
+    $('#show-voting').on('click', function(e){
+        clearLayers();
+        votingLayer.addTo(map);
+        return false;
+    });
+}
+
 $(document).ready(function(){
     initVariables();
 
@@ -142,10 +221,11 @@ $(document).ready(function(){
     loadData();
     countyLayer.addTo(map);
     
-    countyLayer.on('click', function(e) {
-        var point = getPoint(e.latlng.lat, e.latlng.lng);
-        findDistricts(point);
-        
+    layers.forEach(function(layer){
+        layer.on('click', function(e){
+            var point = getPoint(e.latlng.lat, e.latlng.lng);
+            findDistricts(point);
+        });
     });
     $('#search').on('click', function(e){
         e.preventDefault();
