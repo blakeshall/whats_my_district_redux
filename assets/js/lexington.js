@@ -43,8 +43,8 @@ var findDistricts = function(point) {
     })
     lookupMarker.setLatLng([point.geometry.coordinates[1], point.geometry.coordinates[0]]);
     lookupMarker.setOpacity(1)
+     $('.temp').hide();
     // setLayerListeners();
-
 };
 
 var addressLookup = function(query) {
@@ -55,6 +55,34 @@ var addressLookup = function(query) {
             findDistricts(point);
         }
     });
+};
+
+function createCookie(name, value, days) {
+  var expires;
+
+  if (days) {
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toGMTString();
+  } else {
+    expires = "";
+  }
+  document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+}
+
+function readCookie(name) {
+  var nameEQ = encodeURIComponent(name) + "=";
+  var ca = document.cookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+  }
+  return null;
+}
+
+var setAddress = function(address) {
+  $('#search-address').val(address);
 };
 
 var clearLayers = function() {
@@ -74,6 +102,7 @@ var reset = function(){
 }
 
 $(document).ready(function(){
+    setAddress(readCookie("query"));
     initVariables();
 
     map = L.mapbox.map('map', 'mapbox.light')
@@ -99,6 +128,8 @@ $(document).ready(function(){
     })
     $('#search').on('click', function(e){
         e.preventDefault();
-        addressLookup($('#search-address').val() + ' Lexington , KY');
+        var address = $('#search-address').val()
+        createCookie("query", address);
+        addressLookup(address + ' Lexington , KY');
     });
 })

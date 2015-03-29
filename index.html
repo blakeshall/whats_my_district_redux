@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title>What's my district?</title>
+	<title>What's My District?</title>
 
 	<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.css' rel='stylesheet' />
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -15,6 +15,7 @@
 	<script src='assets/js/handlebars-v3.0.0.js'></script>
 	<script src='assets/js/whats-my-district.js'></script>
 	<script src='assets/js/lexington.js'></script>
+	<script src='assets/js/title-case-helper.js'></script>
 </head>
 <body>
 	<style>
@@ -37,11 +38,20 @@
 			/*top: -60px;*/
 			height: 0;
 		}
+		#footer {
+			margin-top: 4em;
+			padding-top: 2em;
+			border-top: 1px #ccc solid;
+			width: 100%;
+		  min-height: 5em;
+		  background-color: #f5f5f5;
+		  text-align: center;
+		}
 	</style>
 	<div class="container">
 		<div class='row'>
 			<div class='col-md-12'>
-				<h1 class='text-center'>What's My District?</h1>
+				<h1 class='text-center'><img src='assets/img/noun_15219.png' heigh="50" width="50" alt='districts'> What's My District?</h1>
 			</div>
 		</div>
 		<div class='row'>
@@ -69,28 +79,36 @@
 			</div>
 		</div>
 		<div class='row'>
-			<div class='col-md-4 text-center'>
+			<div class='col-md-3 col-md-offset-1 text-center'>
 				<h2>State</h2>
-				<div id='senate-results'></div>
-				<div id='house-results'></div>
+				<p class="temp">please enter an address</p>
+				<div class='col-md-offset-2'>
+					<div id='senate-results' class='text-left'></div>
+					<div id='house-results' class='text-left'></div>
+				</div>
 			</div>
 			<div class='col-md-4 text-center'>
 				<h2>Local</h2>
-				<div id='council-results'></div>
-				<div id='magistrate-results'></div>
-				<div id='voting-results'></div>
-				<div id='neighborhood-assoc-results'></div>
+				<p class="temp">please enter an address</p>
+				<div class='col-md-offset-3'>
+					<div id='council-results' class='text-left'></div>
+					<div id='magistrate-results' class='text-left'></div>
+					<div id='voting-results' class='text-left'></div>
+					<div id='neighborhood-assoc-results' class='text-left'></div>
+				</div>
 			</div>
-			<div class='col-md-4 text-center'>
+			<div class='col-md-3 text-center'>
 				<h2>Schools</h2>
-				<div id='elem-results'></div>
-				<div id='middle-results'></div>
-				<div id='high-results'></div>
-				<div id='school-board-results'></div>
+				<p class="temp">please enter an address</p>
+					<div class='col-md-offset-2'>
+					<div id='elem-results' class='text-left'></div>
+					<div id='middle-results' class='text-left'></div>
+					<div id='high-results' class='text-left'></div>
+					<div id='school-board-results' class='text-left'></div>
+				</div>
 			</div>
 		</div>
 
-		
 	</div>
 	<script>
 	    L.mapbox.accessToken = 'pk.eyJ1IjoiYmxha2VzaGFsbCIsImEiOiJRSkN3Y3prIn0.MfDnpigJE6CVbEsV0xwLfA';
@@ -98,70 +116,117 @@
 
 	<script id="house-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>State House District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>State House District:</strong> {{District}}</li>
+	  	<li><strong>Rep:</strong> {{titleCase Rep}}</li>
 	  </ul>
 	</script>
 
 	<script id="senate-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>State Senate District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>State Senate District:</strong> {{District}}</li>
+	  	<li><strong>Rep:</strong> {{titleCase Rep}}</li>
 	  </ul>
 	</script>
 
 	<script id="council-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Council District: {{DISTRICT}} </li>
-	  	<li>Rep: <a href="{{URL}}">{{REP}}</a></li>
-	  	<li>Email: {{EMAIL}}</li>
-	  	<li>Telephone: {{TELEPHONE}}</li>
+	  	<li><strong>Council District:</strong> {{DISTRICT}}</li>
+	  	<li>Rep: <a href="{{URL}}">{{titleCase REP}}</a></li>
+	  	<li>Email: <a href="mailto:{{EMAIL}}">{{EMAIL}}</a></li>
+	  	<li>Telephone: <a href="tel:{{TELEPHONE}}">{{TELEPHONE}}</a></li>
 	  </ul>
+		<h4><strong>Council at-large</strong></h4>
+		<ul class='list-unstyled'>
+			<li>
+				<a class='name' href='http://www.lexingtonky.gov/index.aspx?page=353'>
+					Steve Kay, Vice Mayor
+				</a>
+				<br>
+				<a href="tel:(859) 258-3202">(859) 258-3202</a>
+				&middot;
+				<a href='mailto:skay@lexingtonky.gov'>
+					skay@lexingtonky.gov
+				</a>
+			</li>
+			<li>
+				<a class='name' href='http://www.lexingtonky.gov/index.aspx?page=355'>
+					Kevin Stinnett
+				</a>
+				<br>
+				<a href="tel:(859) 258-3225">(859) 258-3225</a>
+				&middot;
+				<a href='mailto:kstinnett@lexingtonky.gov'>
+					kstinnett@lexingtonky.gov
+				</a>
+			</li>
+			<li>
+				<a class='name' href='http://www.lexingtonky.gov/index.aspx?page=354'>
+					Richard Moloney
+				</a>
+				<br>
+				<a href="tel:(859) 258-3828">(859) 258-3828</a>
+				&middot;
+				<a href='mailto:rmoloney@lexingtonky.gov'>
+					rmoloney@lexingtonky.gov
+				</a>
+			</li>
+		</ul>
+
 	</script>
 
 	<script id="magistrate-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Magistrate District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>Magistrate District:</strong> {{District}}</li>
+	  	<li><strong>Rep:</strong> {{titleCase Rep}}</li>
 	  </ul>
 	</script>
 
 	<script id="voting-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Voting Precinct: {{NAME}} </li>
+	  	<li><strong>Voting Precinct:</strong> {{titleCase NAME}}</li>
 	  </ul>
 	</script>
 
 	<script id="elem-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Elementary School: {{Name}} </li>
+	  	<li><strong>Elementary School:</strong> {{Name}}</li>
 	  </ul>
 	</script>
 
 	<script id="middle-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Middle School: {{SName}} </li>
+	  	<li><strong>Middle School:</strong> {{SName}}</li>
 	  </ul>
 	</script>
 
 	<script id="high-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>High School: {{SName}} </li>
+	  	<li><strong>High School:</strong> {{SName}}</li>
 	  </ul>
 	</script>
 
 	<script id="school-board-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>School Board District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>School Board District:</strong> {{District}}</li>
+	  	<li><strong>Rep:</strong> {{titleCase Rep}}</li>
 	  </ul>
 	</script>
 
 	<script id="neighborhood-assoc-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Neighborhood Association(s): {{Assoc_Name}} </li>
+	  	<li><strong>Neighborhood Association(s):</strong> {{Assoc_Name}}</li>
 	  </ul>
 	</script>
 
+	<div id="footer">
+		<div class="container">
+			<p>
+				Made by <a href="http://openlexington.org">OpenLexington</a> in 2015 |
+				Data from <a href="http://data.lexingtonky.gov">Lexington's Open Data Catalog</a> |
+				<a href="https://github.com/openlexington/whats_my_district_redux">Fork this project on GitHub</a>
+			</p>
+			<p><a href="http://openlexington.org"><img src="assets/img/OpenLex_sm.png"></a></p>
+		</div>
+	</div>
 </body>
 </html>
