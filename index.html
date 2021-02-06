@@ -7,21 +7,18 @@
 
 	<title>What's my district?</title>
 
-	<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.css' rel='stylesheet' />
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.js'></script>
-	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v1.4.0/turf.min.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css' rel='stylesheet' />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js'></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-	<script src='assets/js/handlebars-v3.0.0.js'></script>
-	<script src='assets/js/whats-my-district.js'></script>
-	<script src='assets/js/lexington.js'></script>
+	<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 </head>
 <body>
 	<style>
-		body { }
-		.container { width: 100%;}
+		/* .container { width: 100%;} */
 		#map { height: 450px;}
-		#address-form {
+		/* #address-form {
 			margin-top: 20px;
 			margin-bottom: 10px;
 			width: 450px;
@@ -31,27 +28,21 @@
 			background: #FFF;
 			padding: 10px;
 			padding-left: 25px;
-		}
-		#form-row {
-			/*position: relative;*/
-			/*top: -60px;*/
-			height: 0;
-		}
-	</style>
-	<div class="container">
+		} */
+  </style>
+	<div class="container-fluid">
 		<div class='row'>
 			<div class='col-md-12'>
 				<h1 class='text-center'>What's My District?</h1>
 			</div>
 		</div>
 		<div class='row'>
-			<div class='col-md-12'>
-				<h4 class='text-center'>Type in an address or click on the map to look up districts</h4>
-				<a href='alt.html' class='text-center center-block'>See an alternative design</a>
+			<div class='col'>
+				<h4 class='text-center'>Click on the map to look up districts</h4>
 			</div>
 		</div>
-		<div class='row'>
-			<div class='col-md-12' id='form-row'>
+		<!-- <div class='row'>
+			<div class='col' id='form-row'>
 				<form class="form-inline center-block" id='address-form'>
 				  <div class="form-group">
 				    <label class="sr-only" for="search-address">Address</label>
@@ -63,25 +54,28 @@
 				  <button type="submit" class="btn btn-primary" id='search'>Search</button>
 				</form>
 			</div>
-		</div>
+		</div> -->
 		<div class='row'>
-			<div id='map' class='col-md-12'>
+			<div id='map' class='col'>
 			</div>
 		</div>
 		<div class='row'>
-			<div class='col-md-4 text-center'>
+			<div class='col text-center'>
 				<h2>State</h2>
 				<div id='senate-results'></div>
 				<div id='house-results'></div>
 			</div>
-			<div class='col-md-4 text-center'>
+			<div class='col text-center'>
 				<h2>Local</h2>
 				<div id='council-results'></div>
 				<div id='magistrate-results'></div>
-				<div id='voting-results'></div>
-				<div id='neighborhood-assoc-results'></div>
+        <div id='voting-results'></div>
+        <div>
+          <h4>Neighborhood Associations</h4>
+          <div id='neighborhood-assoc-results'></div>
+        </div>
 			</div>
-			<div class='col-md-4 text-center'>
+			<div class='col text-center'>
 				<h2>Schools</h2>
 				<div id='elem-results'></div>
 				<div id='middle-results'></div>
@@ -91,76 +85,308 @@
 		</div>
 
 		
-	</div>
-	<script>
-	    L.mapbox.accessToken = 'pk.eyJ1IjoiYmxha2VzaGFsbCIsImEiOiJRSkN3Y3prIn0.MfDnpigJE6CVbEsV0xwLfA';
-	</script>
+  </div>
+  <script>
+    var layerNames = [
+      'council',
+      'school-board',
+      'magistrate',
+      'house',
+      'senate',
+      'elem',
+      'middle',
+      'high',
+      'neighborhood-assoc'
+    ]
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYmxha2VzaGFsbCIsImEiOiJRSkN3Y3prIn0.MfDnpigJE6CVbEsV0xwLfA';
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/blakeshall/ckjknph1s03x41aqno63r3ynh',
+      center: [-84.5, 38.05],
+      zoom: 12
+      });
+    
+    map.on('load', function() {
+      map.addSource('council', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Council_District/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'council',
+        'type': 'fill',
+        'source': 'council',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('school-board', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/School_Board_District/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'school-board',
+        'type': 'fill',
+        'source': 'school-board',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('magistrate', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Magisterial_District/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'magistrate',
+        'type': 'fill',
+        'source': 'magistrate',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('house', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/State_House_District/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'house',
+        'type': 'fill',
+        'source': 'house',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('senate', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/State_Senate_District/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'senate',
+        'type': 'fill',
+        'source': 'senate',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('elem', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/FCPS_Elementary_School_Zone_2020/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'elem',
+        'type': 'fill',
+        'source': 'elem',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('middle', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/FCPS_Middle_School_Zone_2020/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'middle',
+        'type': 'fill',
+        'source': 'middle',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('high', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/FCPS_High_School_Zone_2020/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'high',
+        'type': 'fill',
+        'source': 'high',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+      map.addSource('neighborhood-assoc', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Neighborhood_Association/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'neighborhood-assoc',
+        'type': 'fill',
+        'source': 'neighborhood-assoc',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
+
+      var marker = new mapboxgl.Marker();
+
+      map.on('click', function(e) {
+        var districtsFeatures = map.queryRenderedFeatures(
+          e.point,
+          {
+            layers: layerNames
+          }
+        );
+        if (!districtsFeatures.length) {
+          return;
+        }
+        marker.setLngLat({
+          lng: e.lngLat.lng,
+          lat: e.lngLat.lat
+        }).addTo(map)
+
+        layerNames.forEach(layerName => {
+          var id = "#" + layerName + "-results";
+          $(id).html('')
+        })
+
+        var foundNA = false;
+
+        districtsFeatures.forEach(district => {
+          var templateID = "#" + district.source + "-template"
+          var resultsID = "#" + district.source + "-results";
+          var source = $(templateID).html();
+          var template = Handlebars.compile(source);
+          var html = template(district.properties);
+          if (district.layer.id == 'neighborhood-assoc'){
+            foundNA = true;
+            $(resultsID).append(html);
+          } else {
+            $(resultsID).html(html);
+          }
+        });
+
+        if (!foundNA) {
+          $('#neighborhood-assoc-results').html('<p>No Neighborhood Association Found</p>')
+        }
+      });
+    });
+
+    Handlebars.registerHelper('notNull', function(thing, options){
+      // Because of course we can't standardise something as simple as NULL
+      if (!(thing === "null" || thing === "Null" || thing === "NULL")){
+        return options.fn(this);
+      }
+    });
+  </script>
 
 	<script id="house-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>State House District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>State House District</strong>: {{LEGISLATIVE}} </li>
+	  	<li><strong>Representative</strong>{{LEGREP}}</li>
 	  </ul>
 	</script>
 
 	<script id="senate-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>State Senate District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>State Senate District</strong>: {{SENATORIAL}} </li>
+	  	<li><strong>Senator</strong>: {{SENREP}}</li>
 	  </ul>
 	</script>
 
 	<script id="council-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Council District: {{DISTRICT}} </li>
-	  	<li>Rep: <a href="{{URL}}">{{REP}}</a></li>
-	  	<li>Email: {{EMAIL}}</li>
-	  	<li>Telephone: {{TELEPHONE}}</li>
+	  	<li><strong>Council District</strong>: {{DISTRICT}} </li>
+	  	<li><strong>Councilmember</strong>: <a href="{{URL}}">{{REP}}</a></li>
+	  	<address>
+        <a href="mailto:{{EMAIL}}">{{EMAIL}}</a><br>
+        <a href="tel:{{TELEPHONE}}">{{TELEPHONE}}</a>
+      </address>
 	  </ul>
 	</script>
 
 	<script id="magistrate-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Magistrate District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>Magistrate District</strong>: {{MAGISTERIAL}} </li>
+	  	<li><strong>Magistrate</strong>: {{MAGREP}}</li>
 	  </ul>
 	</script>
 
 	<script id="voting-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Voting Precinct: {{NAME}} </li>
+	  	<li><strong>Voting Precinct</strong>: {{NAME}} </li>
 	  </ul>
 	</script>
 
 	<script id="elem-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Elementary School: {{Name}} </li>
+	  	<li><strong>Elementary School</strong>: {{Name}} </li>
 	  </ul>
 	</script>
 
 	<script id="middle-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>Middle School: {{SName}} </li>
+	  	<li><strong>Middle School</strong>: {{Name}} </li>
 	  </ul>
 	</script>
 
 	<script id="high-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>High School: {{SName}} </li>
+	  	<li><strong>High School</strong>: {{Name}} </li>
 	  </ul>
 	</script>
 
 	<script id="school-board-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
-	  	<li>School Board District: {{District}} </li>
-	  	<li>Rep: {{Rep}}</li>
+	  	<li><strong>Board District</strong>: {{SCHOOL}} </li>
+	  	<li><strong>Rep</strong>: {{SCHREP}}</li>
 	  </ul>
 	</script>
 
 	<script id="neighborhood-assoc-template" type="text/x-handlebars-template">
-	  <ul class='list-unstyled'>
-	  	<li>Neighborhood Association(s): {{Assoc_Name}} </li>
-	  </ul>
+    <div class="card">
+      <div class="card-body">
+        <h6 class="card-title">{{Assoc_Name}}</h6>
+        <p class="card-text">Active? {{Active}}</p>
+        {{#notNull Primary_Contact_Name}}
+          <div class="row">
+            <div class="col">
+              <h5>Primary Contact</h5>
+              <address>
+                {{Primary_Contact_Name}}<br>
+                {{#notNull Primary_Contact_Email}}
+                  <a href="mailto:{{Primary_Contact_Email}}">{{Primary_Contact_Email}}</a><br>
+                {{/notNull}}
+                {{#notNull Primary_Contact_Ph_Home}}
+                  <a href="tel:{{Primary_Contact_Ph_Home}}">{{Primary_Contact_Ph_Home}}</a><br>
+                {{/notNull}}
+                {{#notNull Primary_Contact_Addr}}
+                  {{Primary_Contact_Addr}}
+                {{/notNull}}
+              </address>
+            </div>
+          {{/notNull}}
+          {{#notNull Second_Contact_Name}}
+            <div class="col">
+              <h5>Secondary Contact</h5>
+              <address>
+                {{Second_Contact_Name}}<br>
+                {{#notNull Second_Contact_Email}}
+                  <a href="mailto:{{Second_Contact_Email}}">{{Second_Contact_Email}}</a><br>
+                {{/notNull}}
+                {{#notNull Second_Contact_Ph_Home}}
+                  <a href="tel:{{Second_Contact_Ph_Home}}">{{Second_Contact_Ph_Home}}</a><br>
+                {{/notNull}}
+                {{#notNull Second_Contact_Addr}}
+                  {{Second_Contact_Addr}}
+                {{/notNull}}
+              </address>
+            </div>
+          {{/notNull}}
+        </div>
+        
+        {{#notNull Website}}
+          <a href="http://{{Website}}" class="card-link">Website</a>
+        {{/notNull}}
+      </div>
+    </div>
 	</script>
 
 </body>
