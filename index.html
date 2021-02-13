@@ -8,7 +8,7 @@
 	<title>What's my district?</title>
 
   <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css' rel='stylesheet' />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
   <script src='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js'></script>
   <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -46,6 +46,9 @@
       transform: translate(-50%,-50%);
       -ms-transform: translate(-50%,-50%);
     }
+    #addressForm{
+      padding-bottom: 1.5em;
+    }
   </style>
 	<div class="container-fluid">
 		<div class='row'>
@@ -58,15 +61,16 @@
 				<h4 class='text-center'>Click on the map (inside Fayette County) or search for an address to look up districts</h4>
 			</div>
 		</div>
-		<form class="row row-cols-lg-auto g-3 align-items-center" id="addressForm">
-      <div class="col-12">
+		<form class="row" id="addressForm">
+      <div class="col"></div>
+      <div class="col">
         <label class="visually-hidden" for="formInputGroupAddress">Address</label>
         <div class="input-group">
           <input type="text" class="form-control" id="formInputGroupAddress" placeholder="Address">
           <div class="input-group-text">Lexington, KY</div>
         </div>
       </div>
-      <div class="col-12">
+      <div class="col">
         <button type="submit" class="btn btn-primary">Submit</button>
       </div>
     </form>
@@ -343,7 +347,7 @@
 	<script id="house-template" type="text/x-handlebars-template">
 	  <ul class='list-unstyled'>
 	  	<li><strong>State House District</strong>: {{LEGISLATIVE}} </li>
-	  	<li><strong>Representative</strong>{{LEGREP}}</li>
+	  	<li><strong>Representative</strong>: {{LEGREP}}</li>
 	  </ul>
 	</script>
 
