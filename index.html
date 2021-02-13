@@ -29,6 +29,23 @@
 			padding: 10px;
 			padding-left: 25px;
 		} */
+    #overlay {
+      display: block;
+      width: 100%;
+      height: 450px;
+      position: fixed;
+      z-index: 2;
+      background-color: rgba(0,0,0,0.5);
+    }
+    #overlay-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 50px;
+      color: white;
+      transform: translate(-50%,-50%);
+      -ms-transform: translate(-50%,-50%);
+    }
   </style>
 	<div class="container-fluid">
 		<div class='row'>
@@ -38,24 +55,25 @@
 		</div>
 		<div class='row'>
 			<div class='col'>
-				<h4 class='text-center'>Click on the map to look up districts</h4>
+				<h4 class='text-center'>Click on the map (inside Fayette County) or search for an address to look up districts</h4>
 			</div>
 		</div>
-		<!-- <div class='row'>
-			<div class='col' id='form-row'>
-				<form class="form-inline center-block" id='address-form'>
-				  <div class="form-group">
-				    <label class="sr-only" for="search-address">Address</label>
-				    <div class="input-group">
-				      <input type="text" class="form-control" id="search-address" placeholder="560 E. Third St">
-				      <div class="input-group-addon">Lexington, KY</div>
-				    </div>
-				  </div>
-				  <button type="submit" class="btn btn-primary" id='search'>Search</button>
-				</form>
-			</div>
-		</div> -->
-		<div class='row'>
+		<form class="row row-cols-lg-auto g-3 align-items-center" id="addressForm">
+      <div class="col-12">
+        <label class="visually-hidden" for="formInputGroupAddress">Address</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="formInputGroupAddress" placeholder="Address">
+          <div class="input-group-text">Lexington, KY</div>
+        </div>
+      </div>
+      <div class="col-12">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+		<div class='row map-container'>
+      <div id='overlay'>
+        <div id="overlay-text">Loading</div>
+      </div>
 			<div id='map' class='col'>
 			</div>
 		</div>
@@ -86,6 +104,9 @@
 
 		
   </div>
+  <script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
   <script>
     var layerNames = [
       'council',
@@ -105,6 +126,9 @@
       center: [-84.5, 38.05],
       zoom: 12
       });
+
+    var marker = new mapboxgl.Marker();
+    var mapboxClient = mapboxSdk({ accessToken: 'pk.eyJ1IjoiYmxha2VzaGFsbCIsImEiOiJRSkN3Y3prIn0.MfDnpigJE6CVbEsV0xwLfA' });
     
     map.on('load', function() {
       map.addSource('council', {
@@ -225,11 +249,57 @@
         }
       });
 
-      var marker = new mapboxgl.Marker();
+      map.addSource('county', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Fayette_County/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'county',
+        'type': 'line',
+        'source': 'county',
+        'paint': {
+          'line-color': '#000',
+          'line-width': 2
+        }
+      });
 
       map.on('click', function(e) {
-        var districtsFeatures = map.queryRenderedFeatures(
-          e.point,
+        findDistricts(e.point);
+      });
+
+      document.getElementById("overlay").style.display = "none";
+    });
+
+    Handlebars.registerHelper('notNull', function(thing, options){
+      // Because of course we can't standardise something as simple as NULL
+      if (!(thing === "null" || thing === "Null" || thing === "NULL")){
+        return options.fn(this);
+      }
+    });
+
+    $('#addressForm').on('submit', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var inputValue = $('#formInputGroupAddress').val()
+      mapboxClient.geocoding.forwardGeocode(
+      {
+        query: inputValue + ' Lexington KY',
+        limit: 1
+      })
+      .send()
+      .then(function(response){
+        var center = response.body.features[0].center;
+        marker.setLngLat({lng: center[0], lat: center[1]}).addTo(map);
+        var point = map.project(center);
+        findDistricts(point);
+        map.panTo(center);
+      });
+      return false;
+    });
+
+    var findDistricts = function(point){
+      var districtsFeatures = map.queryRenderedFeatures(
+          point,
           {
             layers: layerNames
           }
@@ -237,9 +307,10 @@
         if (!districtsFeatures.length) {
           return;
         }
+        var lngLat = map.unproject(point);
         marker.setLngLat({
-          lng: e.lngLat.lng,
-          lat: e.lngLat.lat
+          lng: lngLat.lng,
+          lat: lngLat.lat
         }).addTo(map)
 
         layerNames.forEach(layerName => {
@@ -266,15 +337,7 @@
         if (!foundNA) {
           $('#neighborhood-assoc-results').html('<p>No Neighborhood Association Found</p>')
         }
-      });
-    });
-
-    Handlebars.registerHelper('notNull', function(thing, options){
-      // Because of course we can't standardise something as simple as NULL
-      if (!(thing === "null" || thing === "Null" || thing === "NULL")){
-        return options.fn(this);
-      }
-    });
+    }
   </script>
 
 	<script id="house-template" type="text/x-handlebars-template">
