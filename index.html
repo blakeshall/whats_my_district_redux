@@ -116,8 +116,10 @@
   <script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
   <script>
-    var layerNames = [
+    var firstLoad = true;
+    var districtLayers = [
       'council',
       'school-board',
       'magistrate',
@@ -127,6 +129,13 @@
       'middle',
       'high',
       'neighborhood-assoc'
+    ]
+
+    var poiLayers = [
+      'fire-station',
+      'post-office',
+      'library',
+      'hospital'
     ]
     mapboxgl.accessToken = 'pk.eyJ1IjoiYmxha2VzaGFsbCIsImEiOiJRSkN3Y3prIn0.MfDnpigJE6CVbEsV0xwLfA';
     var map = new mapboxgl.Map({
@@ -272,8 +281,114 @@
         }
       });
 
+      map.addSource('fire-station', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Fire_Station/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'fire-station',
+        'type': 'symbol',
+        'source': 'fire-station',
+        'layout': {
+          'icon-image': 'fire-station-15'
+        }
+      });
+      map.addSource('post-office', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Post_Office/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'post-office',
+        'type': 'symbol',
+        'source': 'post-office',
+        'layout': {
+          'icon-image': 'post-15'
+        }
+      });
+      map.addSource('library', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Library/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'library',
+        'type': 'symbol',
+        'source': 'library',
+        'layout': {
+          'icon-image': 'library-15'
+        }
+      });
+      map.addSource('hospital', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Hospital/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
+      });
+      map.addLayer({
+        'id': 'hospital',
+        'type': 'symbol',
+        'source': 'hospital',
+        'layout': {
+          'icon-image': 'hospital-15'
+        }
+      });
+      map.addSource('nearest-hospital', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+      map.addSource('nearest-library', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+      map.addSource('nearest-fire-station', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+      map.addSource('nearest-post-office', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: []
+        }
+      });
+
       map.on('click', function(e) {
         findDistricts(e.point);
+      });
+
+      var popup = new mapboxgl.Popup({'closeButton': false});
+
+      map.on('mousemove', function(e) {
+
+        var features = map.queryRenderedFeatures(e.point, { layers: poiLayers });
+        if (!features.length) {
+          popup.remove();
+          return;
+        }
+
+        var feature = features[0];
+
+        var name;
+        if (!!feature.properties.NAME){
+          name = feature.properties.NAME
+        } else {
+          name = feature.properties.MORE
+        }
+
+        popup.setLngLat(feature.geometry.coordinates)
+        .setHTML(
+          "<strong>" + name + "</strong><br /><span>" + feature.properties.ADDRESS + "</span>"
+        )
+        .addTo(map);
+
+        map.getCanvas().style.cursor = features.length ? 'pointer' : '';
+
       });
 
       document.getElementById("overlay").style.display = "none";
@@ -307,10 +422,11 @@
     });
 
     var findDistricts = function(point){
+      findNearestServices(point);
       var districtsFeatures = map.queryRenderedFeatures(
           point,
           {
-            layers: layerNames
+            layers: districtLayers
           }
         );
         if (!districtsFeatures.length) {
@@ -322,7 +438,7 @@
           lat: lngLat.lat
         }).addTo(map)
 
-        layerNames.forEach(layerName => {
+        districtLayers.forEach(layerName => {
           var id = "#" + layerName + "-results";
           $(id).html('')
         })
@@ -347,6 +463,101 @@
           $('#neighborhood-assoc-results').html('<p>No Neighborhood Association Found</p>')
         }
     }
+
+    var findNearestServices = function(point){
+      var coords = map.unproject(point);
+      var turfPoint = turf.point([coords.lng, coords.lat]);
+      var hospitals = turf.featureCollection(map.querySourceFeatures('hospital'));
+      var fireStations = turf.featureCollection(map.querySourceFeatures('fire-station'));
+      var libraries = turf.featureCollection(map.querySourceFeatures('library'));
+      var postOffices = turf.featureCollection(map.querySourceFeatures('post-office'));
+      var nearestHospital = turf.nearest(turfPoint, hospitals)
+      var nearestFireStation = turf.nearest(turfPoint, fireStations)
+      var nearestLibrary = turf.nearest(turfPoint, libraries)
+      var nearestPostOffice = turf.nearest(turfPoint, postOffices)
+      
+      if (nearestHospital !== null) {
+        map.getSource('nearest-hospital').setData({
+          type: 'FeatureCollection',
+          features: [nearestHospital]
+        });
+
+        if (!firstLoad) {
+          map.removeLayer('nearest-hospital');
+        }
+
+        map.addLayer({
+          id: 'nearest-hospital',
+          type: 'circle',
+          source: 'nearest-hospital',
+          paint: {
+            'circle-radius': 12,
+            'circle-color': '#486DE0'
+          }
+        }, 'hospital');
+      }
+      if (nearestFireStation !== null) {
+        map.getSource('nearest-fire-station').setData({
+          type: 'FeatureCollection',
+          features: [nearestFireStation]
+        });
+
+        if (!firstLoad) {
+          map.removeLayer('nearest-fire-station');
+        }
+
+        map.addLayer({
+          id: 'nearest-fire-station',
+          type: 'circle',
+          source: 'nearest-fire-station',
+          paint: {
+            'circle-radius': 12,
+            'circle-color': '#486DE0'
+          }
+        }, 'fire-station');
+      }
+      if (nearestLibrary !== null) {
+        map.getSource('nearest-library').setData({
+          type: 'FeatureCollection',
+          features: [nearestLibrary]
+        });
+
+        if (!firstLoad) {
+          map.removeLayer('nearest-library');
+        }
+
+        map.addLayer({
+          id: 'nearest-library',
+          type: 'circle',
+          source: 'nearest-library',
+          paint: {
+            'circle-radius': 12,
+            'circle-color': '#486DE0'
+          }
+        }, 'library');
+      }
+      if (nearestPostOffice !== null) {
+        map.getSource('nearest-post-office').setData({
+          type: 'FeatureCollection',
+          features: [nearestPostOffice]
+        });
+
+        if (!firstLoad) {
+          map.removeLayer('nearest-post-office');
+        }
+
+        map.addLayer({
+          id: 'nearest-post-office',
+          type: 'circle',
+          source: 'nearest-post-office',
+          paint: {
+            'circle-radius': 12,
+            'circle-color': '#486DE0'
+          }
+        }, 'post-office');
+      }
+      firstLoad = false;
+    };
   </script>
 
 	<script id="house-template" type="text/x-handlebars-template">
