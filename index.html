@@ -128,7 +128,8 @@
       'elem',
       'middle',
       'high',
-      'neighborhood-assoc'
+      'neighborhood-assoc',
+      'voting'
     ]
 
     var poiLayers = [
@@ -266,7 +267,19 @@
           'fill-opacity': 0.0
         }
       });
-
+      map.addSource('voting', {
+        type: 'geojson',
+        data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Voting_Precinct/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson' 
+      });
+      map.addLayer({
+        'id': 'voting',
+        'type': 'fill',
+        'source': 'voting',
+        'paint': {
+          'fill-color': '#088',
+          'fill-opacity': 0.0
+        }
+      });
       map.addSource('county', {
         type: 'geojson',
         data: 'https://services1.arcgis.com/Mg7DLdfYcSWIaDnu/arcgis/rest/services/Fayette_County/FeatureServer/0/query?where=1%3D1&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&returnGeodetic=false&outFields=*&returnGeometry=true&returnCentroid=false&featureEncoding=esriDefault&multipatchOption=xyFootprint&maxAllowableOffset=&geometryPrecision=&outSR=&datumTransformation=&applyVCSProjection=false&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnQueryGeometry=false&returnDistinctValues=false&cacheHint=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&having=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&returnExceededLimitFeatures=true&quantizationParameters=&sqlFormat=none&f=pgeojson&token=' 
