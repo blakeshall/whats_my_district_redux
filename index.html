@@ -12,9 +12,11 @@
   <meta property="og:url" content="https://blakeshall.github.io/whats_my_district_redux/" />
   <meta property="og:image" content="https://blakeshall.github.io/whats_my_district_redux/whats-my-district.png" />
 
-  <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css' rel='stylesheet' />
+  <!-- <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.css' rel='stylesheet' /> -->
+  <link href='https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css' rel='stylesheet' />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-  <script src='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js'></script>
+  <!-- <script src='https://api.mapbox.com/mapbox-gl-js/v2.0.1/mapbox-gl.js'></script> -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js'></script>
   <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
@@ -66,7 +68,7 @@
     </div>
     <div class='row'>
       <div class='col'>
-        <h4 class='text-center'>Click on the map (inside Fayette County) or search for an address to look up districts</h4>
+        <h4 class='text-center'>Click or tap on the map (inside Fayette County) or search for an address to look up districts</h4>
       </div>
     </div>
     <form class="row" id="addressForm">
@@ -159,7 +161,8 @@
       container: 'map',
       style: 'mapbox://styles/blakeshall/ckl83s3i21wr917ovwbzuwtxj',
       center: [-84.5, 38.05],
-      zoom: 12
+      zoom: 12,
+      cooperativeGestures: true
       });
 
     var marker = new mapboxgl.Marker();
@@ -446,6 +449,7 @@
         var point = map.project(center);
         findDistricts(point);
         map.panTo(center);
+        document.getElementById('map').scrollIntoView();
       });
       return false;
     });
