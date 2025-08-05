@@ -2,7 +2,7 @@
 
 ## What is this?
 
-[What's My District?](http://www.whatismydistrict.org) started off as a National
+[What's My District?](http://whatismydistrict.org) started off as a National
 Day of Civic Hacking project. It essentially allows anyone in Lexington, KY to
 input their address and find out all the differenct districts they are in,
 including schools, council districts, magistrate districts, and etc.
